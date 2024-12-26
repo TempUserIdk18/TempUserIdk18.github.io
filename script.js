@@ -12,17 +12,49 @@ require(['vs/editor/editor.main'], function() {
         automaticLayout: true
     });
 
-    // Ensure the editor is ready before accessing its API
-    editor.onDidLayoutChange(() => {
-        editor.layout(); // Refresh layout
-        editor.focus();  // Focus the editor to enable cursor
+    // Smooth cursor animation
+    let cursorAnimationFrame;
+    function smoothCursorMove(targetPos) {
+        const currentPos = editor.getPosition();
+        const deltaLine = (targetPos.lineNumber - currentPos.lineNumber) / 10;
+        const deltaColumn = (targetPos.column - currentPos.column) / 10;
+
+        let step = 0;
+        function animateCursor() {
+            if (step < 10) {
+                editor.setPosition({
+                    lineNumber: Math.round(currentPos.lineNumber + deltaLine * step),
+                    column: Math.round(currentPos.column + deltaColumn * step)
+                });
+                step++;
+                cursorAnimationFrame = requestAnimationFrame(animateCursor);
+            } else {
+                editor.setPosition(targetPos);
+            }
+        }
+        cancelAnimationFrame(cursorAnimationFrame);
+        animateCursor();
+    }
+
+    // Listen for cursor movement
+    editor.onDidChangeCursorPosition((event) => {
+        smoothCursorMove(event.position);
     });
 
-    // Fix for WebView2 cursor rendering issue
-    setTimeout(() => {
-        editor.layout(); // Re-layout to fix cursor alignment
-        editor.focus();  // Focus to ensure cursor visibility
-    }, 200);
+    // Force layout refresh for WebView2 compatibility
+    function refreshEditorLayout() {
+        editor.layout();
+        editor.focus();
+    }
+
+    // Wait for DOM to stabilize
+    setTimeout(refreshEditorLayout, 500);
+
+    // Resize observer to handle dynamic resizing
+    const resizeObserver = new ResizeObserver(() => {
+        refreshEditorLayout();
+    });
+    resizeObserver.observe(editorElement);
 
     // Lua autocomplete suggestions
     monaco.languages.registerCompletionItemProvider('lua', {

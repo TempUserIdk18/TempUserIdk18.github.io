@@ -4,7 +4,7 @@ require(['vs/editor/editor.main'], function() {
 
     // Create editor instance
     const editor = monaco.editor.create(editorElement, {
-        value: "-- discord.gg/WYt9ysVc",
+        value: "-- .gg/WYt9ysVc",
         language: 'lua',
         theme: 'vs-dark',
         fontSize: 16,

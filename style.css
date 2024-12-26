@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+#editor {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform: translateY(0); /* Adjust as needed */
+}
+.cursor {
+    position: absolute;
+    width: 2px;
+    background: #ffffff;
+    animation: blink 0.8s step-end infinite;
+    transition: all 0.1s linear; /* Smooth transition for the cursor movement */
+}
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}

@@ -12,6 +12,7 @@ require(['vs/editor/editor.main'], function() {
         automaticLayout: true
     });
 
+    // Cursor update function
     function updateCursor() {
         const position = editor.getPosition();
         const layoutInfo = editor.getLayoutInfo();
@@ -40,6 +41,7 @@ require(['vs/editor/editor.main'], function() {
 
     updateCursor();
 
+    // Lua autocomplete suggestions
     monaco.languages.registerCompletionItemProvider('lua', {
         provideCompletionItems: () => {
             const suggestions = [
@@ -71,6 +73,7 @@ require(['vs/editor/editor.main'], function() {
         }
     });
 
+    // Lua syntax highlighting
     monaco.languages.setMonarchTokensProvider('lua', {
         tokenizer: {
             root: [
@@ -81,4 +84,13 @@ require(['vs/editor/editor.main'], function() {
             ]
         }
     });
+
+    // Fix for WebView2 cursor issue
+    setTimeout(() => {
+        editor.layout(); // Forces layout update
+        editor.focus();  // Ensures the cursor appears
+    }, 100);
+
+    // Focus the editor to activate cursor
+    editor.focus();
 });

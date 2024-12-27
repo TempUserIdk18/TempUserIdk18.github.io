@@ -17,13 +17,11 @@
             height: 100vh;
             overflow: hidden;
         }
-
         #editor {
-            width: 80%;
-            height: 80%;
+            width: 100%;
+            height: 100%;
             position: relative;
         }
-
         .cursor {
             position: absolute;
             width: 2px;
@@ -45,44 +43,45 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.js"></script>
     <script>
-        let editor;
-        
-        // Initialize Monaco Editor
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
-        require(['vs/editor/editor.main'], function() {
+        require(['vs/editor/editor.main'], function () {
             const editorElement = document.getElementById('editor');
             const cursorElement = document.getElementById('cursor');
 
-            editor = monaco.editor.create(editorElement, {
-                value: "-- discord.gg/WYt9ysVc\nprint('Hello, World!')",
+            const editor = monaco.editor.create(editorElement, {
+                value: "-- discord.gg/WYt9ysVc",
                 language: 'lua',
                 theme: 'vs-dark',
                 fontSize: 16,
-                fontFamily: 'JetBrains Mono',
+                fontFamily: 'Fira Code',
                 automaticLayout: true
             });
 
-            // Sync Monaco's cursor with the custom cursor
-            function updateCustomCursorPosition() {
+            // Update custom cursor position
+            function updateCursor() {
                 const position = editor.getPosition();
-                const layout = editor.getLayoutInfo();
+                const layoutInfo = editor.getLayoutInfo();
                 const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
 
-                const top = layout.contentTop + (position.lineNumber - 1) * lineHeight;
-                const left = layout.contentLeft + (position.column - 1) * layout.characterWidth;
+                const coords = editor.getScrolledVisiblePosition({
+                    lineNumber: position.lineNumber,
+                    column: position.column
+                });
 
-                cursorElement.style.top = `${top}px`;
-                cursorElement.style.left = `${left}px`;
-                cursorElement.style.height = `${lineHeight}px`;
+                if (coords) {
+                    cursorElement.style.top = `${coords.top}px`;
+                    cursorElement.style.left = `${coords.left}px`;
+                    cursorElement.style.height = `${lineHeight}px`;
+                }
             }
 
-            // Update custom cursor on cursor move
+            // Update cursor position on changes
             editor.onDidChangeCursorPosition(() => {
-                updateCustomCursorPosition();
+                updateCursor();
             });
 
-            // Initialize custom cursor position
-            updateCustomCursorPosition();
+            // Initialize cursor position
+            updateCursor();
 
             // Add simple autocompletion for Roblox Lua
             monaco.languages.registerCompletionItemProvider('lua', {
@@ -116,12 +115,12 @@
                 }
             });
 
-            // Ensure syntax highlighting is applied
+            // Enable syntax highlighting
             monaco.languages.setMonarchTokensProvider('lua', {
                 tokenizer: {
                     root: [
                         [/\b(script|game|LocalPlayer|Players|Parent|Workspace|Humanoid|CFrame|Vector3|Instance|FindFirstChild|SetPrimaryPartCFrame|GetService|Wait|print|Instance\.new|TweenService|Debris|ReplicatedStorage|Sound|Color3|part|BrickColor)\b/, 'keyword'],
-                        [/"[^"]*"/, 'string'],
+                        [/".*?"/, 'string'],
                         [/[{}()[\]]/, '@brackets'],
                         [/[+-/*=<>!~]/, 'operator']
                     ]

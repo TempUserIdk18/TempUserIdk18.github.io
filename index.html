@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>custom monaco editor</title>
+    <title>Custom Monaco Editor</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -27,7 +27,7 @@
             width: 2px;
             background: #ffffff;
             animation: blink 0.8s step-end infinite;
-            transition: all 0.1s linear; /* Smooth transition for the cursor movement */
+            transition: all 0.1s linear;
         }
 
         @keyframes blink {
@@ -43,13 +43,15 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.js"></script>
     <script>
+        // Load Monaco editor
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
-        require(['vs/editor/editor.main'], function() {
+        require(['vs/editor/editor.main'], function () {
             const editorElement = document.getElementById('editor');
             const cursorElement = document.getElementById('cursor');
 
+            // Initialize the editor
             const editor = monaco.editor.create(editorElement, {
-                value: "-- discord.gg/WYt9ysVc",
+                value: "-- .gg/WYt9ysVc",
                 language: 'lua',
                 theme: 'vs-dark',
                 fontSize: 16,
@@ -57,7 +59,7 @@
                 automaticLayout: true
             });
 
-            // Update cursor position with smooth transition
+            // Update cursor position
             function updateCursor() {
                 const position = editor.getPosition();
                 const layoutInfo = editor.getLayoutInfo();
@@ -70,20 +72,18 @@
 
                 if (contentWidgetCoords) {
                     cursorElement.style.top = `${contentWidgetCoords.top}px`;
-                    cursorElement.style.left = `${contentWidgetCoords.left}px`;
+                    cursorElement.style.left = `${contentWidgetCoords.left + layoutInfo.contentLeft}px`;
                     cursorElement.style.height = `${lineHeight}px`;
                 }
             }
 
-            // Smoothly update the cursor position during typing
-            let lastPos = editor.getPosition();
-            editor.onDidChangeCursorPosition(() => {
-                const currentPos = editor.getPosition();
-                if (currentPos.lineNumber !== lastPos.lineNumber || currentPos.column !== lastPos.column) {
-                    lastPos = currentPos;
-                    updateCursor();
-                }
-            });
+            // Attach events to update cursor
+            editor.onDidChangeCursorPosition(updateCursor);
+            editor.onDidScrollChange(updateCursor);
+
+            // Expose methods for WebView2 interaction
+            window.getEditorValue = () => editor.getValue();
+            window.setEditorValue = (value) => editor.setValue(value);
 
             // Initialize cursor position
             updateCursor();

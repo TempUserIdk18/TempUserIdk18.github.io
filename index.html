@@ -45,18 +45,20 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.js"></script>
     <script>
+        let editor;
+        
+        // Initialize Monaco Editor
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
-
         require(['vs/editor/editor.main'], function() {
             const editorElement = document.getElementById('editor');
             const cursorElement = document.getElementById('cursor');
 
-            const editor = monaco.editor.create(editorElement, {
+            editor = monaco.editor.create(editorElement, {
                 value: "-- discord.gg/WYt9ysVc\nprint('Hello, World!')",
                 language: 'lua',
                 theme: 'vs-dark',
                 fontSize: 16,
-                fontFamily: 'JetBrains Mono', // JetBrains Mono font for better readability
+                fontFamily: 'JetBrains Mono',
                 automaticLayout: true
             });
 
@@ -125,7 +127,6 @@
                     ]
                 }
             });
-
         });
     </script>
 </body>

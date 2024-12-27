@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>smooth lua</title>
+    <title>Custom Monaco Editor</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -27,8 +27,9 @@
             width: 2px;
             background: #ffffff;
             animation: blink 0.8s step-end infinite;
-            transition: all 0.1s linear; /* Smooth transition for cursor movement */
+            transition: all 0.1s linear;
         }
+
         @keyframes blink {
             50% {
                 opacity: 0;
@@ -47,38 +48,37 @@
             const editorElement = document.getElementById('editor');
             const cursorElement = document.getElementById('cursor');
 
-            // Initialize Monaco Editor
             const editor = monaco.editor.create(editorElement, {
                 value: "-- discord.gg/WYt9ysVc",
                 language: 'lua',
                 theme: 'vs-dark',
                 fontSize: 16,
                 fontFamily: 'JetBrains Mono',
-                automaticLayout: true,
-                cursorStyle: 'line',
-                renderLineHighlight: 'none'
+                automaticLayout: true
             });
 
-            // Function to update custom cursor position
+            // Update custom cursor position
             function updateCursor() {
                 const position = editor.getPosition();
                 const layoutInfo = editor.getLayoutInfo();
                 const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
 
-                const contentWidgetCoords = editor.getScrolledVisiblePosition({
+                const coords = editor.getScrolledVisiblePosition({
                     lineNumber: position.lineNumber,
                     column: position.column
                 });
 
-                if (contentWidgetCoords) {
-                    cursorElement.style.top = `${contentWidgetCoords.top}px`;
-                    cursorElement.style.left = `${contentWidgetCoords.left}px`;
+                if (coords) {
+                    cursorElement.style.top = `${coords.top}px`;
+                    cursorElement.style.left = `${coords.left}px`;
                     cursorElement.style.height = `${lineHeight}px`;
                 }
             }
 
             // Update cursor position on changes
-            editor.onDidChangeCursorPosition(updateCursor);
+            editor.onDidChangeCursorPosition(() => {
+                updateCursor();
+            });
 
             // Initialize cursor position
             updateCursor();
@@ -112,6 +112,18 @@
                         { label: 'BrickColor', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'BrickColor' },
                     ];
                     return { suggestions };
+                }
+            });
+
+            // Enable syntax highlighting
+            monaco.languages.setMonarchTokensProvider('lua', {
+                tokenizer: {
+                    root: [
+                        [/\b(script|game|LocalPlayer|Players|Parent|Workspace|Humanoid|CFrame|Vector3|Instance|FindFirstChild|SetPrimaryPartCFrame|GetService|Wait|print|Instance\.new|TweenService|Debris|ReplicatedStorage|Sound|Color3|part|BrickColor)\b/, 'keyword'],
+                        [/".*?"/, 'string'],
+                        [/[{}()[\]]/, '@brackets'],
+                        [/[+-/*=<>!~]/, 'operator']
+                    ]
                 }
             });
         });

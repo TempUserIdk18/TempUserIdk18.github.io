@@ -56,7 +56,13 @@
                 fontFamily: 'Fira Code',
                 automaticLayout: true
             });
-
+            // Function to get editor value
+            window.getEditorValue = function () {
+               return editor.getValue();
+            };
+            window.setEditorValue = function (newValue) {
+               editor.setValue(newValue);
+            };
             // Update custom cursor position
             function updateCursor() {
                 const position = editor.getPosition();

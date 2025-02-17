@@ -63,6 +63,8 @@
             window.setEditorValue = function (newValue) {
                editor.setValue(newValue);
             };
+             window.setEditorValue = setEditorValue;
+             window.getEditorValue = getEditorValue;
             // Update custom cursor position
             function updateCursor() {
                 const position = editor.getPosition();

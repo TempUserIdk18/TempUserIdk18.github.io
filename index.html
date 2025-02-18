@@ -62,7 +62,7 @@ require(['vs/editor/editor.main'], function () {
     window.setEditorValue = (newValue) => editor.setValue(newValue);
     
     let userDefinedElements = [];
-     document.styleSheets[0].insertRule('.monaco-editor .cursor { visibility: hidden; }', 0);
+
     // Function to detect user-defined variables/functions
     function parseUserDefinedElements(code) {
         const definedVariables = [];
@@ -105,16 +105,6 @@ require(['vs/editor/editor.main'], function () {
     // Update the completion item provider to include dynamic suggestions
     monaco.languages.registerCompletionItemProvider('lua', {
         provideCompletionItems: () => {
-        // Get the line content at the current position
-        const line = model.getLineContent(position.lineNumber);
-
-        // Check if the position is inside a comment (i.e., the line starts with '--' or has '--' in it)
-        const isInsideComment = line.slice(0, position.column - 1).includes('--');
-        
-        // If inside a comment, don't provide any suggestions
-        if (isInsideComment) {
-            return { suggestions: [] };  // No suggestions inside comments
-        }
             const suggestions = [
             { label: 'script', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'script' },
             { label: 'Parent', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Parent' },
@@ -177,31 +167,25 @@ require(['vs/editor/editor.main'], function () {
     });
 
     function updateCursor() {
-    const position = editor.getPosition();
-    const layoutInfo = editor.getLayoutInfo();
-    const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
-
-    if (position) {
-        const coords = editor.getScrolledVisiblePosition({
-            lineNumber: position.lineNumber,
-            column: position.column
-        });
-
-        if (coords) {
-            // Add the scroll offset to the cursor's position
-            cursorElement.style.top = (coords.top + layoutInfo.top) + 'px';
-            cursorElement.style.left = (coords.left + layoutInfo.left) + 'px';
-            cursorElement.style.height = lineHeight + 'px';
+        const position = editor.getPosition();
+        const layoutInfo = editor.getLayoutInfo();
+        const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+        
+        if (position) {
+            const coords = editor.getScrolledVisiblePosition({
+                lineNumber: position.lineNumber,
+                column: position.column
+            });
+            if (coords) {
+                cursorElement.style.top = coords.top + 'px';
+                cursorElement.style.left = coords.left + 'px';
+                cursorElement.style.height = lineHeight + 'px';
+            }
         }
     }
-}
 
-// Attach the updateCursor function to the editor's scroll event
-editor.onDidScrollChange(updateCursor);
-
-// Initial cursor update
-updateCursor();
-
+    editor.onDidChangeCursorPosition(updateCursor);
+    updateCursor();
 
     // Enable syntax highlighting (remains the same)
     monaco.languages.setMonarchTokensProvider('lua', {

@@ -44,162 +44,113 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.js"></script>
     <script>
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
-require(['vs/editor/editor.main'], function () {
-    const editorElement = document.getElementById('editor');
-    const cursorElement = document.getElementById('cursor');
-
-    const editor = monaco.editor.create(editorElement, {
-        value: "-- discord.gg/WYt9ysVc",
-        language: 'lua',
-        theme: 'vs-dark',
-        fontSize: 16,
-        fontFamily: 'Cascadia Code',
-        fontLigatures: true,
-        automaticLayout: true
-    });
-
-    window.getEditorValue = () => editor.getValue();
-    window.setEditorValue = (newValue) => editor.setValue(newValue);
-    
-    let userDefinedElements = [];
-
-    // Function to detect user-defined variables/functions
-    function parseUserDefinedElements(code) {
-        const definedVariables = [];
-        const definedFunctions = [];
-
-        // Regular expressions for detecting variable and function definitions
-        const localVariablePattern = /\blocal\s+([a-zA-Z_]\w*)\s*(=\s*[^,;]*)?/g;  // For local variables (handles with or without values)
-        const variablePattern = /\b([a-zA-Z_]\w*)\s*=\s*/g;  // For global variables
-        const functionPattern = /\bfunction\s+([a-zA-Z_]\w*)\s*\(/g;  // For function definitions
-
-        let match;
-
-        // Extract local variables (with or without assignment)
-        while (match = localVariablePattern.exec(code)) {
-            definedVariables.push(match[1]);  // Push local variables
-        }
-
-        // Extract global variables
-        while (match = variablePattern.exec(code)) {
-            definedVariables.push(match[1]);  // Push global variables
-        }
-
-        // Extract function definitions
-        while (match = functionPattern.exec(code)) {
-            definedFunctions.push(match[1]);  // Push function names
-        }
-
-        return { definedVariables, definedFunctions };
-    }
-
-    // Event listener for model content change to update user-defined elements
-    editor.onDidChangeModelContent((e) => {
-        const code = editor.getValue();
-        const { definedVariables, definedFunctions } = parseUserDefinedElements(code);
-
-        // Merge new elements into the user-defined list (avoiding duplicates)
-        userDefinedElements = [...new Set([...definedVariables, ...definedFunctions])];
-    });
-
-    // Update the completion item provider to include dynamic suggestions
-    monaco.languages.registerCompletionItemProvider('lua', {
-        provideCompletionItems: () => {
-            const suggestions = [
-            { label: 'script', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'script' },
-            { label: 'Parent', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Parent' },
-            { label: 'game', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'game' },
-            { label: 'workspace', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'workspace' },
-            { label: 'Players', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Players' },
-            { label: 'LocalPlayer', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'LocalPlayer' },
-            { label: 'ReplicatedStorage', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'ReplicatedStorage' },
-            { label: 'TweenService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'TweenService' },
-            { label: 'Debris', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Debris' },
-            { label: 'SoundService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'SoundService' },
-            { label: 'UserInputService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'UserInputService' },
-            { label: 'RunService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'RunService' },
-            { label: 'CFrame', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'CFrame' },
-            { label: 'Vector3', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Vector3' },
-            { label: 'Color3', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Color3' },
-            { label: 'BrickColor', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'BrickColor' },
-            { label: 'Instance', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Instance' },
-            { label: 'Enum', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Enum' },
-            { label: 'FindFirstChild', kind: monaco.languages.CompletionItemKind.Function, insertText: 'FindFirstChild("name")' },
-            { label: 'FindFirstChildWhichIsA', kind: monaco.languages.CompletionItemKind.Function, insertText: 'FindFirstChildWhichIsA("ClassName")' },
-            { label: 'WaitForChild', kind: monaco.languages.CompletionItemKind.Function, insertText: 'WaitForChild("name")' },
-            { label: 'SetPrimaryPartCFrame', kind: monaco.languages.CompletionItemKind.Function, insertText: 'SetPrimaryPartCFrame(CFrame.new())' },
-            { label: 'GetService', kind: monaco.languages.CompletionItemKind.Function, insertText: 'GetService("ServiceName")' },
-            { label: 'Clone', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Clone()' },
-            { label: 'Destroy', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Destroy()' },
-            { label: 'print', kind: monaco.languages.CompletionItemKind.Function, insertText: 'print("Hello, world!")' },
-            { label: 'warn', kind: monaco.languages.CompletionItemKind.Function, insertText: 'warn("Warning message")' },
-            { label: 'error', kind: monaco.languages.CompletionItemKind.Function, insertText: 'error("Error message")' },
-            { label: 'Instance.new', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Instance.new("Part")' },
-            { label: 'task.wait', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.wait()' },
-            { label: 'task.spawn', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.spawn(function() \n  -- code \nend)' },
-            { label: 'task.defer', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.defer(function() \n  -- code \nend)' },
-            { label: 'math.random', kind: monaco.languages.CompletionItemKind.Function, insertText: 'math.random(1, 10)' },
-            { label: 'math.clamp', kind: monaco.languages.CompletionItemKind.Function, insertText: 'math.clamp(value, min, max)' },
-            { label: 'table.concat', kind: monaco.languages.CompletionItemKind.Function, insertText: 'table.concat(table, ", ")' },
-            { label: 'table.clear', kind: monaco.languages.CompletionItemKind.Function, insertText: 'table.clear(table)' },
-            { label: 'string.reverse', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.reverse("string")' },
-            { label: 'string.byte', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.byte("string", 1)' },
-            { label: 'string.char', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.char(65)' },
-            { label: 'os.time', kind: monaco.languages.CompletionItemKind.Function, insertText: 'os.time()' },
-            { label: 'os.date', kind: monaco.languages.CompletionItemKind.Function, insertText: 'os.date("%x %X")' },
-            { label: 'tick', kind: monaco.languages.CompletionItemKind.Function, insertText: 'tick()' },
-            { label: 'loadstring', kind: monaco.languages.CompletionItemKind.Function, insertText: 'loadstring("code"))()' },
-            { label: 'pcall', kind: monaco.languages.CompletionItemKind.Function, insertText: 'pcall(function() \n  -- code \nend)' },
-            { label: 'xpcall', kind: monaco.languages.CompletionItemKind.Function, insertText: 'xpcall(function() \n  -- code \nend, function(err) print(err) end)' },
-        ];
-
-            // Add user-defined variables/functions to suggestions
-            userDefinedElements.forEach(element => {
-                suggestions.push({
-                    label: element,
-                    kind: monaco.languages.CompletionItemKind.Variable, // or Function depending on usage
-                    insertText: element
-                });
+        require(['vs/editor/editor.main'], function () {
+            const editorElement = document.getElementById('editor');
+            const cursorElement = document.getElementById('cursor');
+            
+            const editor = monaco.editor.create(editorElement, {
+                value: "-- discord.gg/WYt9ysVc",
+                language: 'lua',
+                theme: 'vs-dark',
+                fontSize: 16,
+                fontFamily: 'Cascadia Code',
+                fontLigatures: true,
+                automaticLayout: true
             });
 
-            return { suggestions };
-        }
-    });
-
-    function updateCursor() {
-        const position = editor.getPosition();
-        const layoutInfo = editor.getLayoutInfo();
-        const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
-        
-        if (position) {
-            const coords = editor.getScrolledVisiblePosition({
-                lineNumber: position.lineNumber,
-                column: position.column
-            });
-            if (coords) {
-                cursorElement.style.top = coords.top + 'px';
-                cursorElement.style.left = coords.left + 'px';
-                cursorElement.style.height = lineHeight + 'px';
+            window.getEditorValue = () => editor.getValue();
+            window.setEditorValue = (newValue) => editor.setValue(newValue);
+            
+            function updateCursor() {
+                const position = editor.getPosition();
+                const layoutInfo = editor.getLayoutInfo();
+                const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+                
+                if (position) {
+                    const coords = editor.getScrolledVisiblePosition({
+                        lineNumber: position.lineNumber,
+                        column: position.column
+                    });
+                    if (coords) {
+                        cursorElement.style.top = coords.top + 'px';
+                        cursorElement.style.left = coords.left + 'px';
+                        cursorElement.style.height = lineHeight + 'px';
+                    }
+                }
             }
-        }
-    }
 
-    editor.onDidChangeCursorPosition(updateCursor);
-    updateCursor();
+            editor.onDidChangeCursorPosition(updateCursor);
+            updateCursor();
 
-    // Enable syntax highlighting (remains the same)
-    monaco.languages.setMonarchTokensProvider('lua', {
-        tokenizer: {
-            root: [
-                [/\b(script|game|LocalPlayer|Players|Parent|Workspace|Humanoid|CFrame|Vector3|Instance|FindFirstChild|SetPrimaryPartCFrame|GetService|Wait|print|Instance\.new|TweenService|Debris|ReplicatedStorage|Sound|Color3|part|BrickColor)\b/, 'keyword'],
-                [/".*?"/, 'string'],
-                [/[{}()[\]]/, '@brackets'],
-                [/[+-/*=<>!~]/, 'operator']
-            ]
-        }
-    });
-});
 
+            // Add simple autocompletion for Roblox Lua
+            monaco.languages.registerCompletionItemProvider('lua', {
+                provideCompletionItems: () => {
+                    const suggestions = [
+                        { label: 'script', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'script' },
+                        { label: 'Parent', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Parent' },
+                        { label: 'game', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'game' },
+                        { label: 'workspace', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'workspace' },
+                        { label: 'Players', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Players' },
+                        { label: 'LocalPlayer', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'LocalPlayer' },
+                        { label: 'ReplicatedStorage', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'ReplicatedStorage' },
+                        { label: 'TweenService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'TweenService' },
+                        { label: 'Debris', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Debris' },
+                        { label: 'SoundService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'SoundService' },
+                        { label: 'UserInputService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'UserInputService' },
+                        { label: 'RunService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'RunService' },
+                        { label: 'CFrame', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'CFrame' },
+                        { label: 'Vector3', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Vector3' },
+                        { label: 'Color3', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Color3' },
+                        { label: 'BrickColor', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'BrickColor' },
+                        { label: 'Instance', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Instance' },
+                        { label: 'Enum', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Enum' },
+                        { label: 'FindFirstChild', kind: monaco.languages.CompletionItemKind.Function, insertText: 'FindFirstChild("name")' },
+                        { label: 'FindFirstChildWhichIsA', kind: monaco.languages.CompletionItemKind.Function, insertText: 'FindFirstChildWhichIsA("ClassName")' },
+                        { label: 'WaitForChild', kind: monaco.languages.CompletionItemKind.Function, insertText: 'WaitForChild("name")' },
+                        { label: 'SetPrimaryPartCFrame', kind: monaco.languages.CompletionItemKind.Function, insertText: 'SetPrimaryPartCFrame(CFrame.new())' },
+                        { label: 'GetService', kind: monaco.languages.CompletionItemKind.Function, insertText: 'GetService("ServiceName")' },
+                        { label: 'Clone', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Clone()' },
+                        { label: 'Destroy', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Destroy()' },
+                        { label: 'print', kind: monaco.languages.CompletionItemKind.Function, insertText: 'print("Hello, world!")' },
+                        { label: 'warn', kind: monaco.languages.CompletionItemKind.Function, insertText: 'warn("Warning message")' },
+                        { label: 'error', kind: monaco.languages.CompletionItemKind.Function, insertText: 'error("Error message")' },
+                        { label: 'Instance.new', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Instance.new("Part")' },
+                        { label: 'task.wait', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.wait()' },
+                        { label: 'task.spawn', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.spawn(function() \n  -- code \nend)' },
+                        { label: 'task.defer', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.defer(function() \n  -- code \nend)' },
+                        { label: 'math.random', kind: monaco.languages.CompletionItemKind.Function, insertText: 'math.random(1, 10)' },
+                        { label: 'math.clamp', kind: monaco.languages.CompletionItemKind.Function, insertText: 'math.clamp(value, min, max)' },
+                        { label: 'table.concat', kind: monaco.languages.CompletionItemKind.Function, insertText: 'table.concat(table, ", ")' },
+                        { label: 'table.clear', kind: monaco.languages.CompletionItemKind.Function, insertText: 'table.clear(table)' },
+                        { label: 'string.reverse', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.reverse("string")' },
+                        { label: 'string.byte', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.byte("string", 1)' },
+                        { label: 'string.char', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.char(65)' },
+                        { label: 'os.time', kind: monaco.languages.CompletionItemKind.Function, insertText: 'os.time()' },
+                        { label: 'os.date', kind: monaco.languages.CompletionItemKind.Function, insertText: 'os.date("%x %X")' },
+                        { label: 'tick', kind: monaco.languages.CompletionItemKind.Function, insertText: 'tick()' },
+                        { label: 'loadstring', kind: monaco.languages.CompletionItemKind.Function, insertText: 'loadstring("code"))()' },
+                        { label: 'pcall', kind: monaco.languages.CompletionItemKind.Function, insertText: 'pcall(function() \n  -- code \nend)' },
+                        { label: 'xpcall', kind: monaco.languages.CompletionItemKind.Function, insertText: 'xpcall(function() \n  -- code \nend, function(err) print(err) end)' },
+                    ];
+                    return { suggestions };
+                }
+            });
+
+            // Enable syntax highlighting
+            monaco.languages.setMonarchTokensProvider('lua', {
+                tokenizer: {
+                    root: [
+                        [/(--.*$)/, 'comment'],
+                        [/\b(script|game|LocalPlayer|Players|Parent|Workspace|Humanoid|CFrame|Vector3|Instance|FindFirstChild|SetPrimaryPartCFrame|GetService|Wait|print|Instance\.new|TweenService|Debris|ReplicatedStorage|Sound|Color3|part|BrickColor)\b/, 'keyword'],
+                        [/"[^"]*"/, 'string'],
+                        [/[{}()[\]]/, '@brackets'],
+                        [/[+-/*=<>!~]/, 'operator'],
+                        [/\b[a-zA-Z_][a-zA-Z0-9_]*\b/, 'variable']
+                    ]
+                }
+            });
+        });
     </script>
 </body>
 </html>

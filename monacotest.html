@@ -167,25 +167,31 @@ require(['vs/editor/editor.main'], function () {
     });
 
     function updateCursor() {
-        const position = editor.getPosition();
-        const layoutInfo = editor.getLayoutInfo();
-        const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
-        
-        if (position) {
-            const coords = editor.getScrolledVisiblePosition({
-                lineNumber: position.lineNumber,
-                column: position.column
-            });
-            if (coords) {
-                cursorElement.style.top = coords.top + 'px';
-                cursorElement.style.left = coords.left + 'px';
-                cursorElement.style.height = lineHeight + 'px';
-            }
+    const position = editor.getPosition();
+    const layoutInfo = editor.getLayoutInfo();
+    const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+
+    if (position) {
+        const coords = editor.getScrolledVisiblePosition({
+            lineNumber: position.lineNumber,
+            column: position.column
+        });
+
+        if (coords) {
+            // Add the scroll offset to the cursor's position
+            cursorElement.style.top = (coords.top + layoutInfo.top) + 'px';
+            cursorElement.style.left = (coords.left + layoutInfo.left) + 'px';
+            cursorElement.style.height = lineHeight + 'px';
         }
     }
+}
 
-    editor.onDidChangeCursorPosition(updateCursor);
-    updateCursor();
+// Attach the updateCursor function to the editor's scroll event
+editor.onDidScrollChange(updateCursor);
+
+// Initial cursor update
+updateCursor();
+
 
     // Enable syntax highlighting (remains the same)
     monaco.languages.setMonarchTokensProvider('lua', {

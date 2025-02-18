@@ -105,13 +105,13 @@ require(['vs/editor/editor.main'], function () {
     // Update the completion item provider to include dynamic suggestions
     monaco.languages.registerCompletionItemProvider('lua', {
         provideCompletionItems: () => {
-            // Get the line and character at the current position
+        // Get the line content at the current position
         const line = model.getLineContent(position.lineNumber);
 
-        // Check if the position is inside a comment (i.e., line starts with '--')
-        const isInsideComment = line.slice(0, position.column - 1).trim().startsWith('--');
+        // Check if the position is inside a comment (i.e., the line starts with '--' or has '--' in it)
+        const isInsideComment = line.slice(0, position.column - 1).includes('--');
         
-        // If inside a comment, don't provide suggestions
+        // If inside a comment, don't provide any suggestions
         if (isInsideComment) {
             return { suggestions: [] };  // No suggestions inside comments
         }

@@ -47,50 +47,41 @@
         require(['vs/editor/editor.main'], function () {
             const editorElement = document.getElementById('editor');
             const cursorElement = document.getElementById('cursor');
-
+            
             const editor = monaco.editor.create(editorElement, {
                 value: "-- discord.gg/WYt9ysVc",
                 language: 'lua',
                 theme: 'vs-dark',
                 fontSize: 16,
                 fontFamily: 'Cascadia Code',
-                fontLigatures: true,  // Enable ligatures
+                fontLigatures: true,
                 automaticLayout: true
             });
-            // Function to get editor value
-            window.getEditorValue = function () {
-               return editor.getValue();
-            };
-            window.setEditorValue = function (newValue) {
-               editor.setValue(newValue);
-            };
-             window.setEditorValue = setEditorValue;
-             window.getEditorValue = getEditorValue;
-            // Update custom cursor position
+
+            window.getEditorValue = () => editor.getValue();
+            window.setEditorValue = (newValue) => editor.setValue(newValue);
+            
             function updateCursor() {
                 const position = editor.getPosition();
                 const layoutInfo = editor.getLayoutInfo();
                 const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
-
-                const coords = editor.getScrolledVisiblePosition({
-                    lineNumber: position.lineNumber,
-                    column: position.column
-                });
-
-                if (coords) {
-                    cursorElement.style.top = `${coords.top}px`;
-                    cursorElement.style.left = `${coords.left}px`;
-                    cursorElement.style.height = `${lineHeight}px`;
+                
+                if (position) {
+                    const coords = editor.getScrolledVisiblePosition({
+                        lineNumber: position.lineNumber,
+                        column: position.column
+                    });
+                    if (coords) {
+                        cursorElement.style.top = coords.top + 'px';
+                        cursorElement.style.left = coords.left + 'px';
+                        cursorElement.style.height = lineHeight + 'px';
+                    }
                 }
             }
 
-            // Update cursor position on changes
-            editor.onDidChangeCursorPosition(() => {
-                updateCursor();
-            });
-
-            // Initialize cursor position
+            editor.onDidChangeCursorPosition(updateCursor);
             updateCursor();
+
 
             // Add simple autocompletion for Roblox Lua
             monaco.languages.registerCompletionItemProvider('lua', {

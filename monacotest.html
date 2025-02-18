@@ -101,19 +101,35 @@ require(['vs/editor/editor.main'], function () {
         // Merge new elements into the user-defined list (avoiding duplicates)
         userDefinedElements = [...new Set([...definedVariables, ...definedFunctions])];
     });
-
+// Enable syntax highlighting (remains the same)
+    monaco.languages.setMonarchTokensProvider('lua', {
+    tokenizer: {
+        root: [
+            // Comment handling
+            [/(--.*$)/, 'comment'],
+            // Strings
+            [/".*?"/, 'string'],
+            // Keywords (only recognized keywords will trigger completions)
+            [/\b(script|game|LocalPlayer|Players|Parent|Workspace|Humanoid|CFrame|Vector3|Instance|FindFirstChild|SetPrimaryPartCFrame|GetService|Wait|print|Instance\.new|TweenService|Debris|ReplicatedStorage|Sound|Color3|part|BrickColor|Enum)\b/, 'keyword'],
+            // Operators
+            [/[{}()[\]]/, '@brackets'],
+            [/[+-/*=<>!~]/, 'operator'],
+            // Variables (only if defined in the current scope, excluding function calls)
+            [/\b[a-zA-Z_][a-zA-Z0-9_]*\b/, 'variable']
+        ]
+    },
+    // Optionally, we can define some of the common Lua variables that should be treated as variables
+    keywords: ['script', 'game', 'LocalPlayer', 'Players', 'Parent', 'Workspace', 'Humanoid', 'CFrame', 'Vector3', 'Instance']
+});
     // Update the completion item provider to include dynamic suggestions
     monaco.languages.registerCompletionItemProvider('lua', {
         provideCompletionItems: () => {
-        // Get the line content at the current position
         const line = model.getLineContent(position.lineNumber);
-
-        // Check if the position is inside a comment (i.e., the line starts with '--' or has '--' in it)
-        const isInsideComment = line.slice(0, position.column - 1).includes('--');
+        const word = model.getWordAtPosition(position);
         
-        // If inside a comment, don't provide any suggestions
-        if (isInsideComment) {
-            return { suggestions: [] };  // No suggestions inside comments
+        // If we're inside a comment, return no suggestions
+        if (line.slice(0, position.column - 1).includes('--')) {
+            return { suggestions: [] };
         }
             const suggestions = [
             { label: 'script', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'script' },
@@ -201,20 +217,6 @@ editor.onDidScrollChange(updateCursor);
 
 // Initial cursor update
 updateCursor();
-
-
-    // Enable syntax highlighting (remains the same)
-    monaco.languages.setMonarchTokensProvider('lua', {
-        tokenizer: {
-            root: [
-                [/\b(script|game|LocalPlayer|Players|Parent|Workspace|Humanoid|CFrame|Vector3|Instance|FindFirstChild|SetPrimaryPartCFrame|GetService|Wait|print|Instance\.new|TweenService|Debris|ReplicatedStorage|Sound|Color3|part|BrickColor)\b/, 'keyword'],
-                [/".*?"/, 'string'],
-                [/[{}()[\]]/, '@brackets'],
-                [/[+-/*=<>!~]/, 'operator']
-            ]
-        }
-    });
-});
 
     </script>
 </body>

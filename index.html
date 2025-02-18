@@ -60,7 +60,17 @@
 
             window.getEditorValue = () => editor.getValue();
             window.setEditorValue = (newValue) => editor.setValue(newValue);
-            
+            // Modify the editor value retrieval to return in chunks
+function getEditorValueChunks(chunkSize) {
+    let value = window.getEditorValue();
+    let chunks = [];
+    
+    for (let i = 0; i < value.length; i += chunkSize) {
+        chunks.push(value.substring(i, i + chunkSize));
+    }
+    
+    return chunks;
+}
             function updateCursor() {
                 const position = editor.getPosition();
                 const layoutInfo = editor.getLayoutInfo();

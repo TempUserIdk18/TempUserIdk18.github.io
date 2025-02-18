@@ -57,20 +57,8 @@
                 fontLigatures: true,
                 automaticLayout: true
             });
-
-            window.getEditorValue = () => editor.getValue();
-            window.setEditorValue = (newValue) => editor.setValue(newValue);
-            // Modify the editor value retrieval to return in chunks
-function getEditorValueChunks(chunkSize) {
-    let value = window.getEditorValue();
-    let chunks = [];
-    
-    for (let i = 0; i < value.length; i += chunkSize) {
-        chunks.push(value.substring(i, i + chunkSize));
-    }
-    
-    return chunks;
-}
+            window.getEditorValue = () => editor.getValue();  // Get the full value of the editor
+            window.setEditorValue = (newValue) => editor.setValue(newValue);  // Update editor value
             function updateCursor() {
                 const position = editor.getPosition();
                 const layoutInfo = editor.getLayoutInfo();

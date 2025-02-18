@@ -69,13 +69,13 @@ require(['vs/editor/editor.main'], function () {
         const definedFunctions = [];
 
         // Regular expressions for detecting variable and function definitions
-        const localVariablePattern = /\blocal\s+([a-zA-Z_]\w*)\s*=\s*/g;  // For local variables
+        const localVariablePattern = /\blocal\s+([a-zA-Z_]\w*)\s*(=\s*[^,;]*)?/g;  // For local variables (handles with or without values)
         const variablePattern = /\b([a-zA-Z_]\w*)\s*=\s*/g;  // For global variables
         const functionPattern = /\bfunction\s+([a-zA-Z_]\w*)\s*\(/g;  // For function definitions
 
         let match;
 
-        // Extract local variables
+        // Extract local variables (with or without assignment)
         while (match = localVariablePattern.exec(code)) {
             definedVariables.push(match[1]);  // Push local variables
         }

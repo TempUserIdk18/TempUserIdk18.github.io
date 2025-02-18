@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Monaco Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Cascadia Code', monospace;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #editor {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .cursor {
+            position: absolute;
+            width: 2px;
+            background: #ffffff;
+            animation: blink 0.8s step-end infinite;
+            transition: all 0.1s linear;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="editor"></div>
+    <div class="cursor" id="cursor"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.js"></script>
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
+require(['vs/editor/editor.main'], function () {
+    const editorElement = document.getElementById('editor');
+    const cursorElement = document.getElementById('cursor');
+
+    const editor = monaco.editor.create(editorElement, {
+        value: "-- discord.gg/WYt9ysVc",
+        language: 'lua',
+        theme: 'vs-dark',
+        fontSize: 16,
+        fontFamily: 'Cascadia Code',
+        fontLigatures: true,
+        automaticLayout: true
+    });
+
+    window.getEditorValue = () => editor.getValue();
+    window.setEditorValue = (newValue) => editor.setValue(newValue);
+    
+    let userDefinedElements = [];
+
+    // Function to detect user-defined variables/functions
+    function parseUserDefinedElements(code) {
+        const definedVariables = [];
+        const definedFunctions = [];
+
+        // Regular expressions for detecting variable and function definitions
+        const localVariablePattern = /\blocal\s+([a-zA-Z_]\w*)\s*=\s*/g;  // For local variables
+        const variablePattern = /\b([a-zA-Z_]\w*)\s*=\s*/g;  // For global variables
+        const functionPattern = /\bfunction\s+([a-zA-Z_]\w*)\s*\(/g;  // For function definitions
+
+        let match;
+
+        // Extract local variables
+        while (match = localVariablePattern.exec(code)) {
+            definedVariables.push(match[1]);  // Push local variables
+        }
+
+        // Extract global variables
+        while (match = variablePattern.exec(code)) {
+            definedVariables.push(match[1]);  // Push global variables
+        }
+
+        // Extract function definitions
+        while (match = functionPattern.exec(code)) {
+            definedFunctions.push(match[1]);  // Push function names
+        }
+
+        return { definedVariables, definedFunctions };
+    }
+
+    // Event listener for model content change to update user-defined elements
+    editor.onDidChangeModelContent((e) => {
+        const code = editor.getValue();
+        const { definedVariables, definedFunctions } = parseUserDefinedElements(code);
+
+        // Merge new elements into the user-defined list (avoiding duplicates)
+        userDefinedElements = [...new Set([...definedVariables, ...definedFunctions])];
+    });
+
+    // Update the completion item provider to include dynamic suggestions
+    monaco.languages.registerCompletionItemProvider('lua', {
+        provideCompletionItems: () => {
+            const suggestions = [
+                // Static suggestions (like you already have)
+                { label: 'script', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'script' },
+                // ... (add other static suggestions here)
+            ];
+
+            // Add user-defined variables/functions to suggestions
+            userDefinedElements.forEach(element => {
+                suggestions.push({
+                    label: element,
+                    kind: monaco.languages.CompletionItemKind.Variable, // or Function depending on usage
+                    insertText: element
+                });
+            });
+
+            return { suggestions };
+        }
+    });
+
+    function updateCursor() {
+        const position = editor.getPosition();
+        const layoutInfo = editor.getLayoutInfo();
+        const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+        
+        if (position) {
+            const coords = editor.getScrolledVisiblePosition({
+                lineNumber: position.lineNumber,
+                column: position.column
+            });
+            if (coords) {
+                cursorElement.style.top = coords.top + 'px';
+                cursorElement.style.left = coords.left + 'px';
+                cursorElement.style.height = lineHeight + 'px';
+            }
+        }
+    }
+
+    editor.onDidChangeCursorPosition(updateCursor);
+    updateCursor();
+
+    // Enable syntax highlighting (remains the same)
+    monaco.languages.setMonarchTokensProvider('lua', {
+        tokenizer: {
+            root: [
+                [/\b(script|game|LocalPlayer|Players|Parent|Workspace|Humanoid|CFrame|Vector3|Instance|FindFirstChild|SetPrimaryPartCFrame|GetService|Wait|print|Instance\.new|TweenService|Debris|ReplicatedStorage|Sound|Color3|part|BrickColor)\b/, 'keyword'],
+                [/".*?"/, 'string'],
+                [/[{}()[\]]/, '@brackets'],
+                [/[+-/*=<>!~]/, 'operator']
+            ]
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

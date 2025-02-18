@@ -62,7 +62,7 @@ require(['vs/editor/editor.main'], function () {
     window.setEditorValue = (newValue) => editor.setValue(newValue);
     
     let userDefinedElements = [];
-
+     document.styleSheets[0].insertRule('.monaco-editor .cursor { visibility: hidden; }', 0);
     // Function to detect user-defined variables/functions
     function parseUserDefinedElements(code) {
         const definedVariables = [];

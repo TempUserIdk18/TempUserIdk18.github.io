@@ -106,10 +106,52 @@ require(['vs/editor/editor.main'], function () {
     monaco.languages.registerCompletionItemProvider('lua', {
         provideCompletionItems: () => {
             const suggestions = [
-                // Static suggestions (like you already have)
-                { label: 'script', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'script' },
-                // ... (add other static suggestions here)
-            ];
+            { label: 'script', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'script' },
+            { label: 'Parent', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Parent' },
+            { label: 'game', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'game' },
+            { label: 'workspace', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'workspace' },
+            { label: 'Players', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Players' },
+            { label: 'LocalPlayer', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'LocalPlayer' },
+            { label: 'ReplicatedStorage', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'ReplicatedStorage' },
+            { label: 'TweenService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'TweenService' },
+            { label: 'Debris', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Debris' },
+            { label: 'SoundService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'SoundService' },
+            { label: 'UserInputService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'UserInputService' },
+            { label: 'RunService', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'RunService' },
+            { label: 'CFrame', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'CFrame' },
+            { label: 'Vector3', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Vector3' },
+            { label: 'Color3', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Color3' },
+            { label: 'BrickColor', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'BrickColor' },
+            { label: 'Instance', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Instance' },
+            { label: 'Enum', kind: monaco.languages.CompletionItemKind.Variable, insertText: 'Enum' },
+            { label: 'FindFirstChild', kind: monaco.languages.CompletionItemKind.Function, insertText: 'FindFirstChild("name")' },
+            { label: 'FindFirstChildWhichIsA', kind: monaco.languages.CompletionItemKind.Function, insertText: 'FindFirstChildWhichIsA("ClassName")' },
+            { label: 'WaitForChild', kind: monaco.languages.CompletionItemKind.Function, insertText: 'WaitForChild("name")' },
+            { label: 'SetPrimaryPartCFrame', kind: monaco.languages.CompletionItemKind.Function, insertText: 'SetPrimaryPartCFrame(CFrame.new())' },
+            { label: 'GetService', kind: monaco.languages.CompletionItemKind.Function, insertText: 'GetService("ServiceName")' },
+            { label: 'Clone', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Clone()' },
+            { label: 'Destroy', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Destroy()' },
+            { label: 'print', kind: monaco.languages.CompletionItemKind.Function, insertText: 'print("Hello, world!")' },
+            { label: 'warn', kind: monaco.languages.CompletionItemKind.Function, insertText: 'warn("Warning message")' },
+            { label: 'error', kind: monaco.languages.CompletionItemKind.Function, insertText: 'error("Error message")' },
+            { label: 'Instance.new', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Instance.new("Part")' },
+            { label: 'task.wait', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.wait()' },
+            { label: 'task.spawn', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.spawn(function() \n  -- code \nend)' },
+            { label: 'task.defer', kind: monaco.languages.CompletionItemKind.Function, insertText: 'task.defer(function() \n  -- code \nend)' },
+            { label: 'math.random', kind: monaco.languages.CompletionItemKind.Function, insertText: 'math.random(1, 10)' },
+            { label: 'math.clamp', kind: monaco.languages.CompletionItemKind.Function, insertText: 'math.clamp(value, min, max)' },
+            { label: 'table.concat', kind: monaco.languages.CompletionItemKind.Function, insertText: 'table.concat(table, ", ")' },
+            { label: 'table.clear', kind: monaco.languages.CompletionItemKind.Function, insertText: 'table.clear(table)' },
+            { label: 'string.reverse', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.reverse("string")' },
+            { label: 'string.byte', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.byte("string", 1)' },
+            { label: 'string.char', kind: monaco.languages.CompletionItemKind.Function, insertText: 'string.char(65)' },
+            { label: 'os.time', kind: monaco.languages.CompletionItemKind.Function, insertText: 'os.time()' },
+            { label: 'os.date', kind: monaco.languages.CompletionItemKind.Function, insertText: 'os.date("%x %X")' },
+            { label: 'tick', kind: monaco.languages.CompletionItemKind.Function, insertText: 'tick()' },
+            { label: 'loadstring', kind: monaco.languages.CompletionItemKind.Function, insertText: 'loadstring("code"))()' },
+            { label: 'pcall', kind: monaco.languages.CompletionItemKind.Function, insertText: 'pcall(function() \n  -- code \nend)' },
+            { label: 'xpcall', kind: monaco.languages.CompletionItemKind.Function, insertText: 'xpcall(function() \n  -- code \nend, function(err) print(err) end)' },
+        ];
 
             // Add user-defined variables/functions to suggestions
             userDefinedElements.forEach(element => {

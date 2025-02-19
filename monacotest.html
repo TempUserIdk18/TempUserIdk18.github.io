@@ -60,8 +60,25 @@
                 automaticLayout: true
             });
 
-            // Cursor handling (keep existing code)
-            function updateCursor() { /* ... */ }
+            window.getEditorValue = () => editor.getValue();  // Get the full value of the editor
+            window.setEditorValue = (newValue) => editor.setValue(newValue);  // Update editor value
+            function updateCursor() {
+                const position = editor.getPosition();
+                const layoutInfo = editor.getLayoutInfo();
+                const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+                
+                if (position) {
+                    const coords = editor.getScrolledVisiblePosition({
+                        lineNumber: position.lineNumber,
+                        column: position.column
+                    });
+                    if (coords) {
+                        cursorElement.style.top = coords.top + 'px';
+                        cursorElement.style.left = coords.left + 'px';
+                        cursorElement.style.height = lineHeight + 'px';
+                    }
+                }
+            }
             editor.onDidChangeCursorPosition(updateCursor);
             updateCursor();
 

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,6 +47,8 @@
         require(['vs/editor/editor.main'], function () {
             const editorElement = document.getElementById('editor');
             const cursorElement = document.getElementById('cursor');
+            // Reparent the cursor element inside the editor container to fix positioning on scroll
+            editorElement.appendChild(cursorElement);
             let customSuggestions = [];
 
             const editor = monaco.editor.create(editorElement, {
@@ -80,6 +81,8 @@
                 }
             }
             editor.onDidChangeCursorPosition(updateCursor);
+            // Also update cursor position when scrolling the editor content
+            editor.onDidScrollChange(updateCursor);
             updateCursor();
 
             // Parse code for custom definitions with debounce
@@ -194,7 +197,8 @@
                     const customItems = customSuggestions.map(item => ({
                         label: item.label,
                         kind: item.kind,
-                        insertText: item.label,
+                        // Automatically add parentheses for function definitions in custom suggestions
+                        insertText: item.kind === monaco.languages.CompletionItemKind.Function ? item.label + "()" : item.label,
                         range: undefined // Let Monaco handle the replacement range
                     }));
 

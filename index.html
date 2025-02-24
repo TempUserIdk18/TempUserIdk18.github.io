@@ -63,11 +63,17 @@
             fetch('https://raw.githubusercontent.com/TempUserIdk18/TempUserIdk18.github.io/main/themes/palenight-operator.json')
     .then(response => response.json())
     .then(data => {
+        console.log('Fetched theme:', data);  // Check if the theme is loaded
         monaco.editor.defineTheme('palenight-operator', data);
         monaco.editor.setTheme('palenight-operator');
     })
     .catch(error => console.error('Error loading theme:', error));
 
+
+
+
+
+            
             window.getEditorValue = () => editor.getValue();  // Get the full value of the editor
             window.setEditorValue = (newValue) => editor.setValue(newValue);  // Update editor value
 

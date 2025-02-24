@@ -475,7 +475,7 @@
     },
     {
       "name": "#292D3E",
-      "scope": "constant.language."#292D3E",
+      "scope": "constant.language.#292D3E",
       "settings": {
         "foreground": "#ff5874"
       }

@@ -63,6 +63,13 @@
 
             window.getEditorValue = () => editor.getValue();  // Get the full value of the editor
             window.setEditorValue = (newValue) => editor.setValue(newValue);  // Update editor value
+
+            window.addEventListener('message', (event) => {
+    if (event.data.type === 'file') {
+        editor.setValue(event.data.content);
+    }
+});
+
             function updateCursor() {
                 const position = editor.getPosition();
                 const layoutInfo = editor.getLayoutInfo();

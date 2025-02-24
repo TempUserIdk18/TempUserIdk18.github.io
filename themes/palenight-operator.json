@@ -475,7 +475,7 @@
     },
     {
       "name": "#292D3E",
-      "scope": "constant.language."#292D3E"",
+      "scope": "constant.language."#292D3E",
       "settings": {
         "foreground": "#ff5874"
       }
@@ -1149,7 +1149,7 @@
       }
     },
     {
-      "name": "Specific JSON Property values like "#292D3E"",
+      "name": "Specific JSON Property values like #292D3E",
       "scope": "meta.structure.dictionary.json meta.structure.dictionary.value constant.language",
       "settings": {
         "foreground": "#ff5874"

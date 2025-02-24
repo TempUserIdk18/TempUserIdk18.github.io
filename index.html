@@ -70,6 +70,27 @@
     }
 });
 
+
+
+            // Handle file drop into the editor
+document.addEventListener('dragover', (event) => {
+    event.preventDefault();
+});
+
+document.addEventListener('drop', (event) => {
+    event.preventDefault();
+    
+    const file = event.dataTransfer.files[0]; // Only handle one file for simplicity
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            editor.setValue(content);
+        };
+        reader.readAsText(file);
+    }
+});
+
             function updateCursor() {
                 const position = editor.getPosition();
                 const layoutInfo = editor.getLayoutInfo();

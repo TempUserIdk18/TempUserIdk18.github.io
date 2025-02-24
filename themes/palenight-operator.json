@@ -1,5 +1,5 @@
 {
-  "base": "vs-dark",  // Added base theme (vs-dark for dark theme)
+  "base": "vs-dark",
   "name": "Palenight Operator",
   "author": "Olaolu Olawuyi",
   "maintainers": ["Olaolu Olawuyi <mrolaolu@gmail.com>"],

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yappanese Translator</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+  textarea { width: 80%; height: 100px; }
+  button { padding: 10px 20px; font-size: 16px; }
+  #output { margin-top: 20px; font-size: 20px; color: #007bff; }
+</style>
+</head>
+<body>
+<h1>Translate to Yappanese</h1>
+<textarea id="inputText" placeholder="Type something..." oninput="translateToYappanese()"></textarea>
+<br>
+<button onclick="copyToClipboard()">Copy</button>
+<div id="output"></div>
+<script>
+function translateToYappanese() {
+    const input = document.getElementById("inputText").value;
+    const output = input.split('').map(char => yappaneseRules(char)).join('');
+    document.getElementById("output").innerText = output;
+}
+function copyToClipboard() {
+    const outputText = document.getElementById("output").innerText;
+    navigator.clipboard.writeText(outputText).then(() => alert("Translated text copied!"));
+}
+function yappaneseRules(char) {
+    const dictionary = {
+        'a': 'yai', 'b': 'boku', 'c': 'cya', 'd': 'doru', 'e': 'eko', 'f': 'fyu', 'g': 'giru',
+        'h': 'hako', 'i': 'izu', 'j': 'joa', 'k': 'kyo', 'l': 'lyu', 'm': 'mii', 'n': 'neo',
+        'o': 'ora', 'p': 'pyo', 'q': 'quna', 'r': 'rya', 's': 'suu', 't': 'tya', 'u': 'uma',
+        'v': 'vyu', 'w': 'wako', 'x': 'xai', 'y': 'yuu', 'z': 'zoi',
+        ' ': ' ', '.': ' piyo ', ',': ' myo ', '!': ' kya ', '?': ' nya '
+    };
+    return dictionary[char.toLowerCase()] || char;
+}
+</script>
+</body>
+</html>
